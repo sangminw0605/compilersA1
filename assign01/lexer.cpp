@@ -24,6 +24,8 @@ Lexer::~Lexer() {
   for (auto i = m_lookahead.begin(); i != m_lookahead.end(); ++i) {
     delete *i;
   }
+
+  fclose(m_in);
 }
 
 Node *Lexer::next() {
