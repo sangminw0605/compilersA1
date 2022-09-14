@@ -13,6 +13,8 @@ enum ASTKind {
   AST_INT_LITERAL,
   AST_UNIT,
   AST_STATEMENT,
+  AST_GREATER,
+  AST_LESS
   // TODO: add members for other AST node kinds
 };
 

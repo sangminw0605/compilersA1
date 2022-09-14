@@ -26,6 +26,10 @@ std::string ASTTreePrint::node_tag_to_string(int tag) const {
   case AST_STATEMENT:
     return "STATEMENT";
   // TODO: add cases for other AST node kinds
+  case AST_GREATER:
+    return "GREATER_THAN";
+  case AST_LESS:
+    return "LESS_THAN";
   default:
     RuntimeError::raise("Unknown AST node type %d\n", tag);
   }

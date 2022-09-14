@@ -14,6 +14,8 @@ enum TokenKind {
   TOK_LPAREN,
   TOK_RPAREN,
   TOK_SEMICOLON,
+  TOK_GREATER,
+  TOK_LESS
   // TODO: add members for additional kinds of tokens
 };
 

@@ -135,6 +135,10 @@ Node *Lexer::read_token() {
     case ';':
       return token_create(TOK_SEMICOLON, lexeme, line, col);
     // TODO: add cases for other kinds of tokens
+    case '>':
+      return token_create(TOK_GREATER, lexeme, line, col);
+    case '<':
+      return token_create(TOK_LESS, lexeme, line, col);
     default:
       SyntaxError::raise(get_current_loc(), "Unrecognized character '%c'", c);
     }
