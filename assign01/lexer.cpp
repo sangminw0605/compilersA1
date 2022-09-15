@@ -132,12 +132,13 @@ Node *Lexer::read_token()
   std::string lexeme;
   lexeme.push_back(char(c));
 
-  printf("%s\n", lexeme.c_str());
-
   if (isalpha(c))
   {
     Node *tok = read_continued_token(TOK_IDENTIFIER, lexeme, line, col, isalnum);
     // TODO: use set_tag to change the token kind if it's actually a keyword
+    if (tok->get_str().compare("var") == 0) {
+      tok->set_tag(TOK_DEFINITION);
+    }
     return tok;
   }
   else if (isdigit(c))

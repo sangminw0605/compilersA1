@@ -21,7 +21,8 @@ enum TokenKind {
   TOK_EQUAL,
   TOK_NOT_EQUAL,
   TOK_LOGICAL_AND,
-  TOK_LOGICAL_OR
+  TOK_LOGICAL_OR,
+  TOK_DEFINITION
   // TODO: add members for additional kinds of tokens
 };
 

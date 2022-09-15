@@ -63,6 +63,7 @@ Node *Parser2::parse_Unit()
 Node *Parser2::parse_Stmt()
 {
   // Stmt -> ^ A ;
+  // Stmt -> ^ var ident ;
 
   std::unique_ptr<Node> s(new Node(AST_STATEMENT));
 
@@ -72,9 +73,20 @@ Node *Parser2::parse_Stmt()
     SyntaxError::raise(m_lexer->get_current_loc(), "Unexpected end of input looking for statement");
   }
 
-  s->append_kid(parse_A());
-  expect_and_discard(TOK_SEMICOLON);
+  int next_tok_tag = next_tok->get_tag();
+  if (next_tok_tag == TOK_DEFINITION) {
+    m_lexer->next();
+    next_tok = expect(TOK_IDENTIFIER);
 
+    
+    Node *ast = new Node(AST_DEFINITION);
+    ast->append_kid(new Node(AST_VARREF, next_tok->get_str()));
+    s->append_kid(ast);
+  } else {
+    s->append_kid(parse_A());
+  }
+  
+  expect_and_discard(TOK_SEMICOLON);
   return s.release();
 }
 
