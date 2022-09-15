@@ -30,6 +30,14 @@ std::string ASTTreePrint::node_tag_to_string(int tag) const {
     return "GREATER_THAN";
   case AST_LESS:
     return "LESS_THAN";
+  case AST_GREATER_EQUAL:
+    return "GREATER_THAN_OR_EQUAL";
+  case AST_LESS_EQUAL:
+    return "LESS_THAN_OR_EQUAL";
+  case AST_EQUAL:
+    return "EQUAL";
+  case AST_NOT_EQUAL:
+    return "NOT_EQUAL";
   default:
     RuntimeError::raise("Unknown AST node type %d\n", tag);
   }

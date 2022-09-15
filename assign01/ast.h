@@ -14,7 +14,11 @@ enum ASTKind {
   AST_UNIT,
   AST_STATEMENT,
   AST_GREATER,
-  AST_LESS
+  AST_LESS,
+  AST_GREATER_EQUAL,
+  AST_LESS_EQUAL,
+  AST_EQUAL,
+  AST_NOT_EQUAL
   // TODO: add members for other AST node kinds
 };
 

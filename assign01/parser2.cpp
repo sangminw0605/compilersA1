@@ -230,8 +230,6 @@ Node *Parser2::parse_L()
 Node *Parser2::parse_R()
 {
 
-  // R -> ^ E >= E
-  // R -> ^ E <= E
   // R -> ^ E == E
   // R -> ^ E != E
 
@@ -245,16 +243,35 @@ Node *Parser2::parse_R()
   if (next_tok != nullptr)
   {
     int next_tok_tag = next_tok->get_tag();
+    int ast_tag;
+
+    switch (next_tok_tag)
+    {
+    case TOK_GREATER:
+      ast_tag = AST_GREATER;
+      break;
+    case TOK_LESS:
+      ast_tag = AST_LESS;
+      break;
+    case TOK_GREATER_EQUAL:
+      ast_tag = AST_GREATER_EQUAL;
+      break;
+    case TOK_LESS_EQUAL:
+      ast_tag = AST_LESS_EQUAL;
+      break;
+    }
+
     // R -> ^ > E
     // R -> ^ < E
-    if (next_tok_tag == TOK_GREATER || next_tok_tag == TOK_LESS)
+    // R -> ^ E >= E
+    // R -> ^ E <= E
+    if (next_tok_tag == TOK_GREATER || next_tok_tag == TOK_LESS || next_tok_tag == TOK_GREATER_EQUAL || next_tok_tag == TOK_LESS_EQUAL)
     {
       std::unique_ptr<Node> op(expect(static_cast<enum TokenKind>(next_tok_tag)));
 
       Node *rhs = parse_E();
-      ast.reset(new Node(next_tok_tag == TOK_GREATER ? AST_GREATER : AST_LESS, {ast.release(), rhs}));
+      ast.reset(new Node(ast_tag, {ast.release(), rhs}));
       ast->set_loc(op->get_loc());
-
     }
   }
 
