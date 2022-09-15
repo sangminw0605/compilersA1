@@ -224,7 +224,40 @@ Node *Parser2::parse_L()
   // L -> ^ R || R
   // L -> ^ R && R
   // L -> ^ R
-  return parse_R();
+
+  std::unique_ptr<Node> ast(parse_R());
+
+  // L -> ^ || R
+  // L -> ^ && R
+  Node *next_tok = m_lexer->peek();
+
+  if (next_tok != nullptr)
+  {
+    int next_tok_tag = next_tok->get_tag();
+    int ast_tag;
+
+    switch (next_tok_tag)
+    {
+    case TOK_LOGICAL_AND:
+      ast_tag = AST_LOGICAL_AND;
+      break;
+    case TOK_LOGICAL_OR:
+      ast_tag = AST_LOGICAL_OR;
+      break;
+    }
+
+
+    if (next_tok_tag == TOK_LOGICAL_AND || next_tok_tag == TOK_LOGICAL_OR)
+    {
+      std::unique_ptr<Node> op(expect(static_cast<enum TokenKind>(next_tok_tag)));
+
+      Node *rhs = parse_R();
+      ast.reset(new Node(ast_tag, {ast.release(), rhs}));
+      ast->set_loc(op->get_loc());
+    }
+  }
+
+  return ast.release();
 }
 
 Node *Parser2::parse_R()
@@ -265,19 +298,13 @@ Node *Parser2::parse_R()
     case TOK_NOT_EQUAL:
       ast_tag = AST_NOT_EQUAL;
       break;
-    case TOK_LOGICAL_AND:
-      ast_tag = AST_LOGICAL_AND;
-      break;
-    case TOK_LOGICAL_OR:
-      ast_tag = AST_LOGICAL_OR;
-      break;
     }
 
     // R -> ^ > E
     // R -> ^ < E
     // R -> ^ E >= E
     // R -> ^ E <= E
-    if (next_tok_tag == TOK_GREATER || next_tok_tag == TOK_LESS || next_tok_tag == TOK_GREATER_EQUAL || next_tok_tag == TOK_LESS_EQUAL || next_tok_tag == TOK_EQUAL || next_tok_tag == TOK_NOT_EQUAL || next_tok_tag == TOK_LOGICAL_AND || next_tok_tag == TOK_LOGICAL_OR)
+    if (next_tok_tag == TOK_GREATER || next_tok_tag == TOK_LESS || next_tok_tag == TOK_GREATER_EQUAL || next_tok_tag == TOK_LESS_EQUAL || next_tok_tag == TOK_EQUAL || next_tok_tag == TOK_NOT_EQUAL)
     {
       std::unique_ptr<Node> op(expect(static_cast<enum TokenKind>(next_tok_tag)));
 
