@@ -186,7 +186,22 @@ Node *Lexer::read_token()
         return token_create(TOK_LESS, lexeme, line, col);
       }
     case '=':
+      un = read();
+      if (un == '=')
+      {
+        return token_create(TOK_EQUAL, lexeme, line, col);
+      }
+      else
+      {
+        unread(un);
+        // TODO: Assignment case
+      }
     case '!':
+      un = read();
+      if (un == '=')
+      {
+        return token_create(TOK_NOT_EQUAL, lexeme, line, col);
+      }
     default:
       SyntaxError::raise(get_current_loc(), "Unrecognized character '%c'", c);
     }
