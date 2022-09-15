@@ -132,8 +132,6 @@ Node *Lexer::read_token()
   std::string lexeme;
   lexeme.push_back(char(c));
 
-  printf("%s\n", lexeme.c_str());
-
   if (isalpha(c))
   {
     Node *tok = read_continued_token(TOK_IDENTIFIER, lexeme, line, col, isalnum);
@@ -202,6 +200,21 @@ Node *Lexer::read_token()
       {
         return token_create(TOK_NOT_EQUAL, lexeme, line, col);
       }
+      break;
+    case '&':
+      un = read();
+      if (un == '&')
+      {
+        return token_create(TOK_LOGICAL_AND, lexeme, line, col);
+      }
+      break;
+    case '|':
+      un = read();
+      if (un == '|')
+      {
+        return token_create(TOK_LOGICAL_OR, lexeme, line, col);
+      }
+      break;
     default:
       SyntaxError::raise(get_current_loc(), "Unrecognized character '%c'", c);
     }

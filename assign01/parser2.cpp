@@ -265,13 +265,19 @@ Node *Parser2::parse_R()
     case TOK_NOT_EQUAL:
       ast_tag = AST_NOT_EQUAL;
       break;
+    case TOK_LOGICAL_AND:
+      ast_tag = AST_LOGICAL_AND;
+      break;
+    case TOK_LOGICAL_OR:
+      ast_tag = AST_LOGICAL_OR;
+      break;
     }
 
     // R -> ^ > E
     // R -> ^ < E
     // R -> ^ E >= E
     // R -> ^ E <= E
-    if (next_tok_tag == TOK_GREATER || next_tok_tag == TOK_LESS || next_tok_tag == TOK_GREATER_EQUAL || next_tok_tag == TOK_LESS_EQUAL || next_tok_tag == TOK_EQUAL || next_tok_tag == TOK_NOT_EQUAL)
+    if (next_tok_tag == TOK_GREATER || next_tok_tag == TOK_LESS || next_tok_tag == TOK_GREATER_EQUAL || next_tok_tag == TOK_LESS_EQUAL || next_tok_tag == TOK_EQUAL || next_tok_tag == TOK_NOT_EQUAL || next_tok_tag == TOK_LOGICAL_AND || next_tok_tag == TOK_LOGICAL_OR)
     {
       std::unique_ptr<Node> op(expect(static_cast<enum TokenKind>(next_tok_tag)));
 

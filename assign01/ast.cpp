@@ -38,6 +38,10 @@ std::string ASTTreePrint::node_tag_to_string(int tag) const {
     return "EQUAL";
   case AST_NOT_EQUAL:
     return "NOT_EQUAL";
+  case AST_LOGICAL_AND:
+    return "LOGICAL_AND";
+  case AST_LOGICAL_OR:
+    return "LOGICAL_OR";
   default:
     RuntimeError::raise("Unknown AST node type %d\n", tag);
   }
