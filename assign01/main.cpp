@@ -56,10 +56,11 @@ int execute(int argc, char **argv) {
     // just print the tokens
     bool done = false;
     while (!done) {
-      Node *tok = lexer->next();
+      Node *tok = lexer->peek();
       if (!tok) {
         done = true;
       } else {
+        tok = lexer->next();
         int kind = tok->get_tag();
         std::string lexeme = tok->get_str();
         printf("%d:%s\n", kind, lexeme.c_str());

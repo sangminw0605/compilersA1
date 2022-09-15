@@ -9,6 +9,7 @@ class Location;
 class Interpreter {
 private:
   Node *m_ast;
+  Environment *env;
 
 public:
   Interpreter(Node *ast_to_adopt);
@@ -18,6 +19,8 @@ public:
   Value execute();
 
 private:
+  Value ex(Node *ast);
+  Value doOp(int tag, int op1, int op2);
   // TODO: private member functions
 };
 
