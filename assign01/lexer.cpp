@@ -195,6 +195,7 @@ Node *Lexer::read_token()
       else
       {
         unread(un);
+        return token_create(TOK_ASSIGNMENT, lexeme, line, col);
         // TODO: Assignment case
       }
     case '!':

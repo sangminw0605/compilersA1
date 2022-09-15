@@ -227,6 +227,16 @@ Node *Parser2::parse_F()
 Node *Parser2::parse_A()
 {
   // A -> ^ ident = A
+  if (m_lexer->peek()->get_tag() == TOK_IDENTIFIER && m_lexer->peek(2)->get_tag() == TOK_ASSIGNMENT) {
+    Node *ref = m_lexer->next();
+
+    std::unique_ptr<Node> ast(new Node(AST_VARREF, ref->get_str()));
+    expect_and_discard(TOK_ASSIGNMENT);
+    Node *rhs = parse_A(); 
+    ast.reset(new Node(AST_ASSIGNMENT, {ast.release(), rhs}));
+
+    return ast.release();
+  }
   // A -> ^ L
   return parse_L();
 }
