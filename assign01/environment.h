@@ -24,7 +24,7 @@ public:
   void assign(std::string var, Value i);
   Value lookup(std::string var);
   void define(std::string var);
-  bool invalids();
+  void clear();
   // TODO: add member functions allowing lookup, definition, and assignment
 };
 

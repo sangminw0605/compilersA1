@@ -38,14 +38,7 @@ void Environment::define(std::string var)
   references.insert({var, 0});
 }
 
-bool Environment::invalids()
-{
-  for (auto it = references.begin(); it != references.end(); ++it)
-  {
-    if (it->second.get_ival() == -1) {
-      return true;
-    }
-  }
-  return false;
+void Environment::clear() {
+  references.clear();
 }
   // TODO: implement member functions
