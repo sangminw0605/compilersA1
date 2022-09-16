@@ -23,8 +23,14 @@ public:
   Value execute();
 
 private:
+
+  // Evaluate expression of a given node
   Value ex(Node *ast);
+
+  // Perform the associated operation
   Value doOp(int tag, int op1, int op2, Node *divisor);
+
+  // Recursively analyze AST for semantic errors
   void analyze_recurse(Node *ast);
   // TODO: private member functions
 };

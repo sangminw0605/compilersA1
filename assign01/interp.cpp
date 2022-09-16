@@ -19,34 +19,37 @@ Interpreter::~Interpreter()
   delete env;
 }
 
-
-bool cmp(std::string a, std::string b) {
-    return a.compare(b) == 0;
-}
-
 void Interpreter::analyze()
 {
+  // Recursively analyze nodes of the ast
   analyze_recurse(m_ast);
 }
 
 void Interpreter::analyze_recurse(Node *ast)
 {
+  // variable was referenced
   if (ast->get_tag() == AST_VARREF)
   {
+
+    // Check if VARREF was defined
     for (auto i = set.begin(); i != set.end(); i++) {
       if (((*i).compare(ast->get_str())) == 0) {
         return;
       }
     }
+
+    // VARREF was not defined, raise error
     const std::string err = std::string("Undefined reference to name '") + ast->get_str().c_str() + "'";
     SemanticError::raise(ast->get_loc(), err.c_str());
   }
 
+  // We define a VARREF, insert into map
   if (ast->get_tag() == AST_DEFINITION)
   {
     set.insert(ast->get_kid(0)->get_str().c_str());
   }
 
+  // Check all of node's children
   for (unsigned int i = 0; i < ast->get_num_kids(); i++)
   {
     analyze_recurse(ast->get_kid(i));

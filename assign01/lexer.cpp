@@ -24,6 +24,7 @@ Lexer::~Lexer()
     delete *i;
   }
 
+  // Closed file
   fclose(m_in);
 }
 
@@ -136,6 +137,8 @@ Node *Lexer::read_token()
   {
     Node *tok = read_continued_token(TOK_IDENTIFIER, lexeme, line, col, isalnum);
     // TODO: use set_tag to change the token kind if it's actually a keyword
+    
+    // We have a VAR definition
     if (tok->get_str().compare("var") == 0) {
       tok->set_tag(TOK_DEFINITION);
     }
@@ -165,6 +168,7 @@ Node *Lexer::read_token()
       return token_create(TOK_SEMICOLON, lexeme, line, col);
     // TODO: add cases for other kinds of tokens
     case '>':
+      // Check next char
       un = read();
       if (un == '=')
       {
@@ -176,6 +180,7 @@ Node *Lexer::read_token()
         return token_create(TOK_GREATER, lexeme, line, col);
       }
     case '<':
+      // Check next char
       un = read();
       if (un == '=')
       {
@@ -187,6 +192,7 @@ Node *Lexer::read_token()
         return token_create(TOK_LESS, lexeme, line, col);
       }
     case '=':
+      // Check next char
       un = read();
       if (un == '=')
       {
@@ -199,13 +205,15 @@ Node *Lexer::read_token()
         // TODO: Assignment case
       }
     case '!':
+      // Check next char
       un = read();
       if (un == '=')
       {
         return token_create(TOK_NOT_EQUAL, lexeme, line, col);
       }
       break;
-    case '&':
+    case '&':       
+      // Check next char
       un = read();
       if (un == '&')
       {
@@ -215,6 +223,7 @@ Node *Lexer::read_token()
       }
       break;
     case '|':
+      // Check next char
       un = read();
       if (un == '|')
       {

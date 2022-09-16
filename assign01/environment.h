@@ -21,10 +21,14 @@ public:
   Environment(Environment *parent = nullptr);
   ~Environment();
 
+  // Assign value to a VARREF
   void assign(std::string var, Value i);
+
+  // Retrieve value of a VARREF
   Value lookup(std::string var);
+
+  // Define a VARREF
   void define(std::string var);
-  void clear();
   // TODO: add member functions allowing lookup, definition, and assignment
 };
 

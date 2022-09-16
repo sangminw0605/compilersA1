@@ -25,6 +25,7 @@ private:
   Node *parse_TPrime(Node *ast);
   Node *parse_F();
   
+  // New parse functions/productions
   Node *parse_A();
   Node *parse_L();
   Node *parse_R();
