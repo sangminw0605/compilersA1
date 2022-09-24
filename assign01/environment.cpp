@@ -34,8 +34,4 @@ void Environment::define(std::string var)
   // use int min as a marker for now
   references.insert({var, 0});
 }
-
-void Environment::clear() {
-  references.clear();
-}
   // TODO: implement member functions
