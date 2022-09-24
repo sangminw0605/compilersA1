@@ -23,7 +23,11 @@ enum TokenKind {
   TOK_LOGICAL_AND,
   TOK_LOGICAL_OR,
   TOK_DEFINITION,
-  TOK_ASSIGNMENT
+  TOK_ASSIGNMENT,
+  TOK_IF,
+  TOK_ELSE,
+  TOK_LBRACK,
+  TOK_RBRACK
   // TODO: add members for additional kinds of tokens
 };
 

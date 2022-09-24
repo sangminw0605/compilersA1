@@ -30,6 +30,9 @@ private:
   Node *parse_L();
   Node *parse_R();
 
+  Node *parse_TStmt();
+  Node *parse_SList();
+
   // Consume a specific token, wrapping it in a Node
   Node *expect(enum TokenKind tok_kind);
 

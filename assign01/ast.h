@@ -22,7 +22,10 @@ enum ASTKind {
   AST_LOGICAL_AND,
   AST_LOGICAL_OR,
   AST_DEFINITION,
-  AST_ASSIGNMENT
+  AST_ASSIGNMENT,
+  AST_IF,
+  AST_ELSE,
+  AST_STATEMENT_LIST
   // TODO: add members for other AST node kinds
 };
 

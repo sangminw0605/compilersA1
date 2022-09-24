@@ -49,15 +49,23 @@ Node *Parser2::parse_Unit()
   // note that this function produces a "flattened" representation
   // of the unit
 
+  // Unit -> TStmt
+  // Unit -> TStmt Unit
   std::unique_ptr<Node> unit(new Node(AST_UNIT));
   for (;;)
   {
-    unit->append_kid(parse_Stmt());
+    unit->append_kid(parse_TStmt());
     if (m_lexer->peek() == nullptr)
       break;
   }
 
   return unit.release();
+}
+
+Node *Parser2::parse_TStmt()
+{
+  // TStmt -> Stmt
+  return parse_Stmt();
 }
 
 Node *Parser2::parse_Stmt()
@@ -72,9 +80,59 @@ Node *Parser2::parse_Stmt()
     SyntaxError::raise(m_lexer->get_current_loc(), "Unexpected end of input looking for statement");
   }
 
-  // Stmt -> ^ var ident ;
   int next_tok_tag = next_tok->get_tag();
-  if (next_tok_tag == TOK_DEFINITION)
+  // Stmt -> ^ if ( A ) { SList }
+  // Stmt -> ^ if ( A ) { SList } else { SList }
+  if (next_tok_tag == TOK_IF)
+  {
+    // Stmt -> ^ ( A ) { SList }
+    m_lexer->next();
+
+    Node *ast = new Node(AST_IF);
+    s->append_kid(ast);
+
+    // Stmt -> ^ A ) { SList }
+    expect_and_discard(TOK_LPAREN);
+
+    // Stmt -> ^ ) { SList }
+    ast->append_kid(parse_A());
+
+    // Stmt -> ^ { SList }
+    expect_and_discard(TOK_RPAREN);
+
+    // Stmt -> ^ SList }
+    expect_and_discard(TOK_LBRACK);
+
+    // Stmt -> ^ }
+    ast->append_kid(parse_SList());
+
+    // Stmt -> ^ else { SList }
+    expect_and_discard(TOK_RBRACK);
+
+    next_tok = m_lexer->peek();
+
+    if (next_tok != nullptr)
+    {
+      ast = new Node(AST_ELSE);
+      s->append_kid(ast);
+
+      // Stmt -> ^ { SList }
+      expect_and_discard(TOK_ELSE);
+
+      // Stmt -> ^ SList }
+      expect_and_discard(TOK_LBRACK);
+
+      // Stmt -> ^ }
+      ast->append_kid(parse_SList());
+
+      // Stmt -> ^
+      expect_and_discard(TOK_RBRACK);
+    }
+
+    return s.release();
+  }
+  // Stmt -> ^ var ident ;
+  else if (next_tok_tag == TOK_DEFINITION)
   {
     m_lexer->next();
     // Stmt -> ^ ident ;
@@ -91,6 +149,22 @@ Node *Parser2::parse_Stmt()
   }
 
   expect_and_discard(TOK_SEMICOLON);
+  return s.release();
+}
+
+Node *Parser2::parse_SList()
+{
+  std::unique_ptr<Node> s(new Node(AST_STATEMENT_LIST));
+
+  Node *ast = parse_Stmt();
+
+  s->append_kid(ast);
+
+  Node *next_tok = m_lexer->peek();
+  if (next_tok != nullptr && next_tok->get_tag() != TOK_RBRACK) {
+    s->append_kid(parse_SList());
+  }
+
   return s.release();
 }
 

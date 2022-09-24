@@ -137,11 +137,21 @@ Node *Lexer::read_token()
   {
     Node *tok = read_continued_token(TOK_IDENTIFIER, lexeme, line, col, isalnum);
     // TODO: use set_tag to change the token kind if it's actually a keyword
-    
+
     // We have a VAR definition
-    if (tok->get_str().compare("var") == 0) {
+    if (tok->get_str().compare("var") == 0)
+    {
       tok->set_tag(TOK_DEFINITION);
     }
+    else if (tok->get_str().compare("if") == 0)
+    {
+      tok->set_tag(TOK_IF);
+    }
+    else if (tok->get_str().compare("else") == 0)
+    {
+      tok->set_tag(TOK_ELSE);
+    }
+
     return tok;
   }
   else if (isdigit(c))
@@ -167,6 +177,10 @@ Node *Lexer::read_token()
     case ';':
       return token_create(TOK_SEMICOLON, lexeme, line, col);
     // TODO: add cases for other kinds of tokens
+    case '{':
+      return token_create(TOK_LBRACK, lexeme, line, col);
+    case '}':
+      return token_create(TOK_RBRACK, lexeme, line, col);
     case '>':
       // Check next char
       un = read();
@@ -212,13 +226,15 @@ Node *Lexer::read_token()
         return token_create(TOK_NOT_EQUAL, lexeme, line, col);
       }
       break;
-    case '&':       
+    case '&':
       // Check next char
       un = read();
       if (un == '&')
       {
         return token_create(TOK_LOGICAL_AND, lexeme, line, col);
-      } else {
+      }
+      else
+      {
         unread(un);
       }
       break;
@@ -228,7 +244,9 @@ Node *Lexer::read_token()
       if (un == '|')
       {
         return token_create(TOK_LOGICAL_OR, lexeme, line, col);
-      } else {
+      }
+      else
+      {
         unread(un);
       }
       break;

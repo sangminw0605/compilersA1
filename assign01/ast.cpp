@@ -46,6 +46,12 @@ std::string ASTTreePrint::node_tag_to_string(int tag) const {
     return "DEFINITION";
   case AST_ASSIGNMENT:
     return "ASSIGNMENT";
+  case AST_IF:
+    return "IF";
+  case AST_ELSE:
+    return "ELSE";
+  case AST_STATEMENT_LIST:
+    return "AST_STATEMENT_LIST";
   default:
     RuntimeError::raise("Unknown AST node type %d\n", tag);
   }
