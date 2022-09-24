@@ -32,8 +32,10 @@ void Interpreter::analyze_recurse(Node *ast)
   {
 
     // Check if VARREF was defined
-    for (auto i = set.begin(); i != set.end(); i++) {
-      if (((*i).compare(ast->get_str())) == 0) {
+    for (auto i = set.begin(); i != set.end(); i++)
+    {
+      if (((*i).compare(ast->get_str())) == 0)
+      {
         return;
       }
     }
@@ -55,8 +57,6 @@ void Interpreter::analyze_recurse(Node *ast)
     analyze_recurse(ast->get_kid(i));
   }
 }
-
-
 
 Value Interpreter::execute()
 {
@@ -100,6 +100,21 @@ Value Interpreter::ex(Node *ast)
   }
 
   int val1 = (ex(ast->get_kid(0))).get_ival();
+
+  if (ast->get_tag() == AST_LOGICAL_AND)
+  {
+    if (val1 == 0)
+    {
+      return 0;
+    }
+  }
+  else if (ast->get_tag() == AST_LOGICAL_OR)
+  {
+    if (val1 != 0) {
+      return 1;
+    }
+  }
+
   int val2 = (ex(ast->get_kid(1))).get_ival();
 
   return doOp(ast->get_tag(), val1, val2, ast->get_kid(1));
