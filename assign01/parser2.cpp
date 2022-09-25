@@ -315,7 +315,7 @@ Node *Parser2::parse_F()
     ast->set_str(tok->get_str());
     ast->set_loc(tok->get_loc());
 
-    if (ast_tag == AST_VARREF && m_lexer->peek() != nullptr && m_lexer->peek()->get_tag() != TOK_RPAREN)
+    if (ast->get_tag() == AST_VARREF && m_lexer->peek() != nullptr && m_lexer->peek()->get_tag() == TOK_LPAREN)
     {
       ast->set_tag(AST_FNCALL);
 
@@ -388,10 +388,6 @@ Node *Parser2::parse_L()
 {
   std::unique_ptr<Node> ast(parse_R());
 
-  if (m_lexer->peek()->get_tag() == TOK_RPAREN)
-  {
-    return nullptr;
-  }
   // L -> ^ || R
   // L -> ^ && R
   // L -> ^
@@ -431,10 +427,6 @@ Node *Parser2::parse_R()
   // Get ast corresponding to E
   std::unique_ptr<Node> ast(parse_E());
 
-  if (m_lexer->peek()->get_tag() == TOK_RPAREN)
-  {
-    return nullptr;
-  }
   // peek at next token
   Node *next_tok = m_lexer->peek();
 
