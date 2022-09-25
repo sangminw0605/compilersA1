@@ -113,8 +113,7 @@ Node *Parser2::parse_Stmt()
 
     if (next_tok != nullptr && next_tok->get_tag() == TOK_ELSE)
     {
-      ast = new Node(AST_ELSE);
-      s->append_kid(ast);
+      ast->append_kid(new Node(AST_ELSE));
 
       // Stmt -> ^ { SList }
       expect_and_discard(TOK_ELSE);
@@ -123,7 +122,7 @@ Node *Parser2::parse_Stmt()
       expect_and_discard(TOK_LBRACK);
 
       // Stmt -> ^ }
-      ast->append_kid(parse_SList());
+      ast->get_last_kid()->append_kid(parse_SList());
 
       // Stmt -> ^
       expect_and_discard(TOK_RBRACK);

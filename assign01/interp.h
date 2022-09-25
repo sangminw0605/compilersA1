@@ -24,7 +24,6 @@ public:
 private:
 
   // Evaluate expression of a given node
-  //Value ex(Node *ast);
 
   Value ex(Node *ast, Environment *env);
 
