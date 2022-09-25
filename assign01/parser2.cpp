@@ -315,7 +315,7 @@ Node *Parser2::parse_F()
     ast->set_str(tok->get_str());
     ast->set_loc(tok->get_loc());
 
-    if (m_lexer->peek() != nullptr && m_lexer->peek()->get_tag() != TOK_RPAREN)
+    if (ast_tag == AST_VARREF && m_lexer->peek() != nullptr && m_lexer->peek()->get_tag() != TOK_RPAREN)
     {
       ast->set_tag(AST_FNCALL);
 
