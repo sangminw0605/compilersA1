@@ -131,6 +131,34 @@ Node *Parser2::parse_Stmt()
 
     return s.release();
   }
+  else if (next_tok_tag == TOK_WHILE)
+  {
+    m_lexer->next();
+
+    Node *ast = new Node(AST_WHILE);
+    s->append_kid(ast);
+
+    // Stmt -> ^ A ) { SList }
+    expect_and_discard(TOK_LPAREN);
+
+    // Stmt -> ^ ) { SList }
+    ast->append_kid(parse_A());
+
+    // Stmt -> ^ { SList }
+    expect_and_discard(TOK_RPAREN);
+
+    // Stmt -> ^ SList }
+    expect_and_discard(TOK_LBRACK);
+
+    // Stmt -> ^ }
+    ast->append_kid(parse_SList());
+
+    // Stmt -> ^ else { SList }
+    expect_and_discard(TOK_RBRACK);
+
+    return s.release();
+  }
+
   // Stmt -> ^ var ident ;
   else if (next_tok_tag == TOK_DEFINITION)
   {
@@ -161,7 +189,8 @@ Node *Parser2::parse_SList()
   s->append_kid(ast);
 
   Node *next_tok = m_lexer->peek();
-  if (next_tok != nullptr && next_tok->get_tag() != TOK_RBRACK) {
+  if (next_tok != nullptr && next_tok->get_tag() != TOK_RBRACK)
+  {
     s->append_kid(parse_SList());
   }
 

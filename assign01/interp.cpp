@@ -122,8 +122,17 @@ Value Interpreter::ex(Node *ast, Environment *env)
 
   if (ast->get_tag() == AST_IF)
   {
-    int x = ex(ast->get_kid(0), env).get_ival();
-    if (x != 0)
+    if (ex(ast->get_kid(0), env).get_ival() != 0)
+    {
+      Environment *block_env = new Environment(env);
+      ex(ast->get_kid(1), block_env);
+    }
+    return 0;
+  }
+
+  if (ast->get_tag() == AST_WHILE)
+  {
+    while (ex(ast->get_kid(0), env).get_ival() != 0)
     {
       Environment *block_env = new Environment(env);
       ex(ast->get_kid(1), block_env);
