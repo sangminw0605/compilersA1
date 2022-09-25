@@ -12,7 +12,6 @@ class Location;
 class Interpreter {
 private:
   Node *m_ast;
-  Environment *env;
   std::set<std::string> set;
 
 public:
@@ -25,8 +24,11 @@ public:
 private:
 
   // Evaluate expression of a given node
-  Value ex(Node *ast);
+  //Value ex(Node *ast);
 
+  Value ex(Node *ast, Environment *env);
+
+  Environment* findEnv(Node *ref, Environment *env);
   // Perform the associated operation
   Value doOp(int tag, int op1, int op2, Node *divisor);
 

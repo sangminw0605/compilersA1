@@ -12,6 +12,7 @@ private:
 
   // TODO: representation of environment (map of names to values)
   std::map<std::string, Value> references;
+  
 
   // copy constructor and assignment operator prohibited
   Environment(const Environment &);
@@ -21,12 +22,14 @@ public:
   Environment(Environment *parent = nullptr);
   ~Environment();
 
+  Environment* getParent();
   // Assign value to a VARREF
   void assign(std::string var, Value i);
 
   // Retrieve value of a VARREF
   Value lookup(std::string var);
 
+  bool has(std::string var);
   // Define a VARREF
   void define(std::string var);
   // TODO: add member functions allowing lookup, definition, and assignment

@@ -10,13 +10,11 @@
 Interpreter::Interpreter(Node *ast_to_adopt)
     : m_ast(ast_to_adopt)
 {
-  env = new Environment();
 }
 
 Interpreter::~Interpreter()
 {
   delete m_ast;
-  delete env;
 }
 
 void Interpreter::analyze()
@@ -58,6 +56,7 @@ void Interpreter::analyze_recurse(Node *ast)
   }
 }
 
+/*
 Value Interpreter::execute()
 {
   // TODO: implement
@@ -67,9 +66,104 @@ Value Interpreter::execute()
   }
 
   return ex(m_ast->get_last_kid());
+}*/
+
+Value Interpreter::execute()
+{
+  // TODO: implement
+  Environment *global_env = new Environment();
+  for (unsigned int i = 0; i < m_ast->get_num_kids() - 1; i++)
+  {
+    ex(m_ast->get_kid(i), global_env);
+  }
+
+  return ex(m_ast->get_last_kid(), global_env);
 }
 
-Value Interpreter::ex(Node *ast)
+Value Interpreter::ex(Node *ast, Environment *env)
+{
+  if (ast->get_tag() == AST_STATEMENT_LIST)
+  {
+    for (unsigned int i = 0; i < ast->get_num_kids(); i++)
+    {
+      ex(ast->get_kid(i), env);
+    }
+    return 0;
+  }
+
+  if (ast->get_tag() == AST_STATEMENT)
+  {
+    return ex(ast->get_kid(0), env);
+  }
+
+  if (ast->get_tag() == AST_INT_LITERAL)
+  {
+    return atoi(ast->get_str().c_str());
+  }
+
+  if (ast->get_tag() == AST_DEFINITION)
+  {
+    env->define(ast->get_str());
+    return 0;
+  }
+
+  if (ast->get_tag() == AST_ASSIGNMENT)
+  {
+    Environment *location = findEnv(ast, env);
+    location->assign(ast->get_kid(0)->get_str(), ex(ast->get_kid(1), env));
+    return location->lookup(ast->get_kid(0)->get_str());
+  }
+
+  if (ast->get_tag() == AST_VARREF)
+  {
+    Environment *location = findEnv(ast, env);
+    return location->lookup(ast->get_str());
+  }
+
+  if (ast->get_tag() == AST_IF)
+  {
+    int x = ex(ast->get_kid(0), env).get_ival();
+    if (x != 0)
+    {
+      Environment *block_env = new Environment(env);
+      ex(ast->get_kid(1), block_env);
+    }
+    return 0;
+  }
+
+  int val1 = (ex(ast->get_kid(0), env)).get_ival();
+
+  if (ast->get_tag() == AST_LOGICAL_AND)
+  {
+    if (val1 == 0)
+    {
+      return 0;
+    }
+  }
+  else if (ast->get_tag() == AST_LOGICAL_OR)
+  {
+    if (val1 != 0)
+    {
+      return 1;
+    }
+  }
+
+  int val2 = (ex(ast->get_kid(1), env)).get_ival();
+
+  return doOp(ast->get_tag(), val1, val2, ast->get_kid(1));
+}
+
+Environment *Interpreter::findEnv(Node *ref, Environment *env)
+{
+  while (!env->has(ref->get_str()))
+  {
+    env = env->getParent();
+  }
+
+  return env;
+}
+
+/*Value Interpreter::ex(Node *ast)
 {
   if (ast->get_tag() == AST_STATEMENT)
   {
@@ -118,7 +212,7 @@ Value Interpreter::ex(Node *ast)
   int val2 = (ex(ast->get_kid(1))).get_ival();
 
   return doOp(ast->get_tag(), val1, val2, ast->get_kid(1));
-}
+}*/
 
 Value Interpreter::doOp(int tag, int op1, int op2, Node *divisor)
 {

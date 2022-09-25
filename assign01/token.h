@@ -27,7 +27,7 @@ enum TokenKind {
   TOK_IF,
   TOK_ELSE,
   TOK_LBRACK,
-  TOK_RBRACK
+  TOK_RBRACK,
   // TODO: add members for additional kinds of tokens
 };
 

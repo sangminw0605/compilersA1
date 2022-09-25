@@ -20,6 +20,14 @@ void Environment::assign(std::string var, Value i)
   references[var] = i;
 }
 
+bool Environment::has(std::string var) {
+  return (references.count(var) != 0);
+}
+
+Environment* Environment::getParent() {
+  return m_parent;
+}
+
 Value Environment::lookup(std::string var)
 {
   // F → ident
