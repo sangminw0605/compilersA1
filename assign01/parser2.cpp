@@ -111,7 +111,7 @@ Node *Parser2::parse_Stmt()
 
     next_tok = m_lexer->peek();
 
-    if (next_tok != nullptr)
+    if (next_tok != nullptr && next_tok->get_tag() == TOK_ELSE)
     {
       ast = new Node(AST_ELSE);
       s->append_kid(ast);
