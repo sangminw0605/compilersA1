@@ -314,11 +314,28 @@ Node *Parser2::parse_F()
     std::unique_ptr<Node> ast(new Node(ast_tag));
     ast->set_str(tok->get_str());
     ast->set_loc(tok->get_loc());
+
+    if (m_lexer->peek() != nullptr && m_lexer->peek()->get_tag() != TOK_RPAREN)
+    {
+      ast->set_tag(AST_FNCALL);
+
+      expect_and_discard(TOK_LPAREN);
+
+      Node *args = parse_OptArgList();
+
+      if (args != nullptr)
+      {
+        ast->append_kid(args);
+      }
+
+      expect_and_discard(TOK_RPAREN);
+    }
+
     return ast.release();
   }
   else if (tag == TOK_LPAREN)
   {
-    // F -> ^ ( E )
+    // F -> ^ ( A )
     expect_and_discard(TOK_LPAREN);
     std::unique_ptr<Node> ast(parse_A());
     expect_and_discard(TOK_RPAREN);
@@ -328,6 +345,22 @@ Node *Parser2::parse_F()
   {
     SyntaxError::raise(next_tok->get_loc(), "Invalid primary expression");
   }
+}
+
+Node *Parser2::parse_OptArgList()
+{
+  if (m_lexer->peek() != nullptr && m_lexer->peek()->get_tag() != TOK_RPAREN)
+  {
+    return parse_ArgList();
+  }
+
+  return nullptr;
+}
+
+Node *Parser2::parse_ArgList()
+{
+  // MAKE ARGLIST AST NODE AND APPEND L AND ARGLIST KIDS TO IT
+  return parse_L();
 }
 
 Node *Parser2::parse_A()
@@ -355,6 +388,10 @@ Node *Parser2::parse_L()
 {
   std::unique_ptr<Node> ast(parse_R());
 
+  if (m_lexer->peek()->get_tag() == TOK_RPAREN)
+  {
+    return nullptr;
+  }
   // L -> ^ || R
   // L -> ^ && R
   // L -> ^
@@ -391,10 +428,13 @@ Node *Parser2::parse_L()
 
 Node *Parser2::parse_R()
 {
-
   // Get ast corresponding to E
   std::unique_ptr<Node> ast(parse_E());
 
+  if (m_lexer->peek()->get_tag() == TOK_RPAREN)
+  {
+    return nullptr;
+  }
   // peek at next token
   Node *next_tok = m_lexer->peek();
 

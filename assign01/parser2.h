@@ -4,7 +4,8 @@
 #include "lexer.h"
 #include "node.h"
 
-class Parser2 {
+class Parser2
+{
 private:
   Lexer *m_lexer;
   Node *m_next;
@@ -24,7 +25,7 @@ private:
   Node *parse_T();
   Node *parse_TPrime(Node *ast);
   Node *parse_F();
-  
+
   // New parse functions/productions
   Node *parse_A();
   Node *parse_L();
@@ -32,6 +33,9 @@ private:
 
   Node *parse_TStmt();
   Node *parse_SList();
+
+  Node *parse_OptArgList();
+  Node *parse_ArgList();
 
   // Consume a specific token, wrapping it in a Node
   Node *expect(enum TokenKind tok_kind);

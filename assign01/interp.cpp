@@ -60,7 +60,6 @@ void Interpreter::analyze_recurse(Node *ast)
 Value Interpreter::execute()
 {
   // TODO: implement
-  ifExecuted = false;
   Environment *global_env = new Environment();
   for (unsigned int i = 0; i < m_ast->get_num_kids() - 1; i++)
   {
@@ -209,3 +208,19 @@ Value Interpreter::doOp(int tag, int op1, int op2, Node *divisor)
   }
   return 0;
 }
+
+/*Value Interpreter::intrinsic_print(Value args[], unsigned num_args,
+                                   const Location &loc, Interpreter *interp) {
+  if (num_args != 1)
+    EvaluationError::raise(loc, "Wrong number of arguments passed to print function");
+  printf("%s", args[0].as_str().c_str());
+  return Value();
+}
+
+Value Interpreter::intrinsic_println(Value args[], unsigned num_args,
+                                   const Location &loc, Interpreter *interp) {
+  if (num_args != 1)
+    EvaluationError::raise(loc, "Wrong number of arguments passed to print function");
+  printf("%s\n", args[0].as_str().c_str());
+  return Value();
+}*/
