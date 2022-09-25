@@ -104,7 +104,8 @@ Node *Parser2::parse_Stmt()
     expect_and_discard(TOK_LBRACK);
 
     // Stmt -> ^ }
-    ast->append_kid(parse_SList());
+    Node *ifbody = new Node(AST_STATEMENT_LIST);
+    ast->append_kid(parse_SList(ifbody));
 
     // Stmt -> ^ else { SList }
     expect_and_discard(TOK_RBRACK);
@@ -113,7 +114,8 @@ Node *Parser2::parse_Stmt()
 
     if (next_tok != nullptr && next_tok->get_tag() == TOK_ELSE)
     {
-      ast->append_kid(new Node(AST_ELSE));
+      Node *elsestate = new Node(AST_ELSE);
+      ast->append_kid(elsestate);
 
       // Stmt -> ^ { SList }
       expect_and_discard(TOK_ELSE);
@@ -122,7 +124,8 @@ Node *Parser2::parse_Stmt()
       expect_and_discard(TOK_LBRACK);
 
       // Stmt -> ^ }
-      ast->get_last_kid()->append_kid(parse_SList());
+      Node *elsebody = new Node(AST_STATEMENT_LIST);
+      elsestate->append_kid(parse_SList(elsebody));
 
       // Stmt -> ^
       expect_and_discard(TOK_RBRACK);
@@ -150,7 +153,8 @@ Node *Parser2::parse_Stmt()
     expect_and_discard(TOK_LBRACK);
 
     // Stmt -> ^ }
-    ast->append_kid(parse_SList());
+    Node *whilebody = new Node(AST_STATEMENT_LIST);
+    ast->append_kid(parse_SList(whilebody));
 
     // Stmt -> ^ else { SList }
     expect_and_discard(TOK_RBRACK);
@@ -179,21 +183,19 @@ Node *Parser2::parse_Stmt()
   return s.release();
 }
 
-Node *Parser2::parse_SList()
+Node *Parser2::parse_SList(Node *statelist)
 {
-  std::unique_ptr<Node> s(new Node(AST_STATEMENT_LIST));
-
   Node *ast = parse_Stmt();
 
-  s->append_kid(ast);
+  statelist->append_kid(ast);
 
   Node *next_tok = m_lexer->peek();
   if (next_tok != nullptr && next_tok->get_tag() != TOK_RBRACK)
   {
-    s->append_kid(parse_SList());
+    statelist = parse_SList(statelist);
   }
 
-  return s.release();
+  return statelist;
 }
 
 Node *Parser2::parse_E()
@@ -349,12 +351,19 @@ Node *Parser2::parse_F()
 
 Node *Parser2::parse_OptArgList()
 {
-  if (m_lexer->peek() != nullptr && m_lexer->peek()->get_tag() != TOK_RPAREN)
+  if (m_lexer->peek()->get_tag() == TOK_RPAREN)
   {
-    return parse_ArgList();
+    return nullptr;
   }
 
-  return nullptr;
+  std::unique_ptr<Node> ast(new Node(AST_STATEMENT_LIST));
+
+  while (m_lexer->peek() != nullptr && m_lexer->peek()->get_tag() != TOK_RPAREN)
+  {
+    ast->append_kid(parse_ArgList());
+  }
+
+  return ast.release();
 }
 
 Node *Parser2::parse_ArgList()

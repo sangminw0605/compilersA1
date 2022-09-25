@@ -32,7 +32,7 @@ private:
   Node *parse_R();
 
   Node *parse_TStmt();
-  Node *parse_SList();
+  Node *parse_SList(Node *statelist);
 
   Node *parse_OptArgList();
   Node *parse_ArgList();
