@@ -202,7 +202,7 @@ Value Interpreter::ex(Node *ast, Environment *env)
 
 Environment *Interpreter::findEnv(Node *ref, Environment *env)
 {
-  while (!env->has(ref->get_str()))
+  while (!env->has(ref->get_str()) && env->getParent() != nullptr)
   {
     env = env->getParent();
   }
