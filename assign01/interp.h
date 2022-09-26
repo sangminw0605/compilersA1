@@ -32,7 +32,7 @@ private:
   Value doOp(int tag, int op1, int op2, Node *divisor);
 
   // Recursively analyze AST for semantic errors
-  void analyze_recurse(Node *ast);
+  void analyze_recurse(Node *ast, Environment *env);
   // TODO: private member functions
 
   static Value intrinsic_print(Value args[], unsigned num_args, const Location &loc, Interpreter *interp);

@@ -20,24 +20,27 @@ Interpreter::~Interpreter()
 void Interpreter::analyze()
 {
   // Recursively analyze nodes of the ast
-  set.insert("print");
-  set.insert("println");
-  analyze_recurse(m_ast);
+
+  // Create environment for checking
+  Environment *env = new Environment();
+
+  // Define intrinsic functions
+  env->define("print");
+  env->define("println");
+
+  // Recurse over tree to search for semantic error
+  analyze_recurse(m_ast, env);
 }
 
-void Interpreter::analyze_recurse(Node *ast)
+void Interpreter::analyze_recurse(Node *ast, Environment *env)
 {
   // variable was referenced
   if (ast->get_tag() == AST_VARREF)
   {
 
     // Check if VARREF was defined
-    for (auto i = set.begin(); i != set.end(); i++)
-    {
-      if (((*i).compare(ast->get_str())) == 0)
-      {
-        return;
-      }
+    if (findEnv(ast, env)->has(ast->get_str())) {
+      return;
     }
 
     // VARREF was not defined, raise error
@@ -48,17 +51,13 @@ void Interpreter::analyze_recurse(Node *ast)
   // We define a VARREF, insert into map
   if (ast->get_tag() == AST_DEFINITION)
   {
-    if (set.find(ast->get_str()) != set.end())
-    {
-      SemanticError::raise(ast->get_loc(), "Variable already defined");
-    }
-    set.insert(ast->get_kid(0)->get_str().c_str());
+    env->define(ast->get_kid(0)->get_str());
   }
 
   // Check all of node's children
   for (unsigned int i = 0; i < ast->get_num_kids(); i++)
   {
-    analyze_recurse(ast->get_kid(i));
+    analyze_recurse(ast->get_kid(i), env);
   }
 }
 

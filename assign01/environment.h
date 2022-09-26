@@ -29,7 +29,9 @@ public:
   // Retrieve value of a VARREF
   Value lookup(std::string var);
 
+  // Check if var exists in current environment
   bool has(std::string var);
+
   // Define a VARREF
   void define(std::string var);
   // TODO: add member functions allowing lookup, definition, and assignment
