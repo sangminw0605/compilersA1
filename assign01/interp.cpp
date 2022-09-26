@@ -92,12 +92,12 @@ Value Interpreter::ex(Node *ast, Environment *env)
   {
     Environment *location = findEnv(ast, env);
 
-    unsigned numargs = ast->get_num_kids();
+    unsigned numargs = ast->get_kid(0)->get_num_kids();
     Value args[numargs];
 
-    for (unsigned int i = 0; i < ast->get_num_kids(); i++)
+    for (unsigned int i = 0; i < ast->get_kid(0)->get_num_kids(); i++)
     {
-      args[i] = ex(ast->get_kid(i), env);
+      args[i] = ex(ast->get_kid(0)->get_kid(i), env);
     }
 
     IntrinsicFn fn = (location->lookup(ast->get_str())).get_intrinsic_fn();

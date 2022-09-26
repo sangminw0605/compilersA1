@@ -353,16 +353,26 @@ Node *Parser2::parse_OptArgList()
 {
   if (m_lexer->peek() != nullptr && m_lexer->peek()->get_tag() != TOK_RPAREN)
   {
-    return parse_ArgList();
+    Node *ast = new Node(AST_ARGUMENT_LIST);
+    parse_ArgList(ast);
+    return ast;
   }
 
   return nullptr;
 }
 
-Node *Parser2::parse_ArgList()
+Node *Parser2::parse_ArgList(Node *ast)
 {
   // MAKE ARGLIST AST NODE AND APPEND L AND ARGLIST KIDS TO IT
-  return parse_L();
+   ast->append_kid(parse_L());
+
+  if (m_lexer->peek() != nullptr && m_lexer->peek()->get_tag() == TOK_COMMA)
+  {
+    expect_and_discard(TOK_COMMA);
+    parse_ArgList(ast);
+  }
+
+  return ast;
 }
 
 Node *Parser2::parse_A()

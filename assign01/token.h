@@ -30,7 +30,8 @@ enum TokenKind {
   TOK_RBRACK,
   TOK_WHILE,
   TOK_FNCALL,
-  TOK_ARGUMENT_LIST
+  TOK_ARGUMENT_LIST,
+  TOK_COMMA
   // TODO: add members for additional kinds of tokens
 };
 

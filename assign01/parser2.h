@@ -35,7 +35,7 @@ private:
   Node *parse_SList(Node *statelist);
 
   Node *parse_OptArgList();
-  Node *parse_ArgList();
+  Node *parse_ArgList(Node *ast);
 
   // Consume a specific token, wrapping it in a Node
   Node *expect(enum TokenKind tok_kind);

@@ -181,6 +181,8 @@ Node *Lexer::read_token()
     case ';':
       return token_create(TOK_SEMICOLON, lexeme, line, col);
     // TODO: add cases for other kinds of tokens
+    case ',':
+      return token_create(TOK_COMMA, lexeme, line, col);
     case '{':
       return token_create(TOK_LBRACK, lexeme, line, col);
     case '}':

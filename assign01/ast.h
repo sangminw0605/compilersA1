@@ -27,7 +27,8 @@ enum ASTKind {
   AST_ELSE,
   AST_STATEMENT_LIST,
   AST_WHILE,
-  AST_FNCALL
+  AST_FNCALL,
+  AST_ARGUMENT_LIST
   // TODO: add members for other AST node kinds
 };
 
