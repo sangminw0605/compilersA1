@@ -13,3 +13,23 @@ reach the base case of an INT_LITERAL or a VARREF, of which the INT_LITERAL can 
 and the VARREF can be searched for from the Environment object, which is a wrapper for mappings
 of VARREFs to their associated values. The last statement in the ast is also printed as the
 result.
+
+As a continuation of the previous README, my implementation remains simple.
+After adding the new productions associated with A2M1, I was able to build
+new ASTs with control flow structures, short circuiting, and intrinsic function
+calls to print() and println(). The control flow keywords (if, else, while) are very
+similar, in that the condition is executed as is any Statement in the interpreter,
+and a 'true' integer value (int != 0) executes the Statements in the block, and a 'false'
+value (int == 0) does not. Note that non-numeric values raise an error. The same premise
+occurs for while loops, but with the caveat that it executes until the condition evaluates
+to false. An else statement may (only) be triggered if an if statement condition evaluates
+to false. Note that for each of these, entering the body of the control flow unit creates a
+new block, for which a new environment must be created. These blocks/environments may be nested
+as each environment contains a pointer to its parent, so we are able to traverse up the entire
+environment list should we need to. This comes in handy for identifying scope of a variable. Variables
+are found by recursing up the environment parent pointers and returning the value associated with the
+variable. The short circuiting is accomplished by checking the first operand of the logical operators
+(&& and ||), and returning the appropriate value (0, 1) if we do not need to check the second
+operand. The intrinsic functions exist as variables in the environment, and have their function calls
+defined in the interpreter, and bound to the keyword in the environment. Other variables may actually
+reference these functions, using the assignment operator.

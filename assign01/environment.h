@@ -22,7 +22,9 @@ public:
   Environment(Environment *parent = nullptr);
   ~Environment();
 
+  // Return parent of this environment
   Environment* getParent();
+  
   // Assign value to a VARREF
   void assign(std::string var, Value i);
 

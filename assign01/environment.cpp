@@ -15,32 +15,37 @@ Environment::~Environment()
   references.clear();
 }
 
+// Assign a value to a defined variable
 void Environment::assign(std::string var, Value i)
 {
   references[var] = i;
 }
 
+// Check if var is defined in this environment
 bool Environment::has(std::string var)
 {
   return (references.count(var) != 0);
 }
 
+// Return parent
 Environment *Environment::getParent()
 {
   return m_parent;
 }
 
+// Return value of var
 Value Environment::lookup(std::string var)
 {
   // F → ident
   return references[var];
 }
 
+// Define a var
 void Environment::define(std::string var)
 {
   // Stmt → var ident ;
 
-  // use int min as a marker for now
+  // use as a marker for now
   references.insert({var, -1});
 }
 // TODO: implement member functions

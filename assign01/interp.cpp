@@ -248,6 +248,7 @@ Value Interpreter::ex(Node *ast, Environment *env)
   return doOp(ast->get_tag(), val1, val2, ast->get_kid(1));
 }
 
+// Recursively find the appropriate environment for a var
 Environment *Interpreter::findEnv(Node *ref, Environment *env)
 {
   while (!env->has(ref->get_str()) && env->getParent() != nullptr)
@@ -258,6 +259,7 @@ Environment *Interpreter::findEnv(Node *ref, Environment *env)
   return env;
 }
 
+// Perform associated operation
 Value Interpreter::doOp(int tag, int op1, int op2, Node *divisor)
 {
 
@@ -301,6 +303,7 @@ Value Interpreter::doOp(int tag, int op1, int op2, Node *divisor)
   return 0;
 }
 
+// Intrinsic print operation
 Value Interpreter::intrinsic_print(Value args[], unsigned num_args,
                                    const Location &loc, Interpreter *interp)
 {
@@ -310,6 +313,7 @@ Value Interpreter::intrinsic_print(Value args[], unsigned num_args,
   return Value();
 }
 
+// Intrinsic println operation
 Value Interpreter::intrinsic_println(Value args[], unsigned num_args,
                                      const Location &loc, Interpreter *interp)
 {
@@ -319,6 +323,7 @@ Value Interpreter::intrinsic_println(Value args[], unsigned num_args,
   return Value();
 }
 
+// Return true if var value is non numeric
 bool Interpreter::non_numeric(Node *ast, Environment *env)
 {
   switch (ast->get_tag())

@@ -185,6 +185,7 @@ Node *Parser2::parse_Stmt()
 
 Node *Parser2::parse_SList(Node *statelist)
 {
+  // SList -> ^ Stmt
   Node *ast = parse_Stmt();
 
   statelist->append_kid(ast);
@@ -192,6 +193,7 @@ Node *Parser2::parse_SList(Node *statelist)
   Node *next_tok = m_lexer->peek();
   if (next_tok != nullptr && next_tok->get_tag() != TOK_RBRACK)
   {
+    // SList -> ^ Stmt
     statelist = parse_SList(statelist);
   }
 
@@ -319,17 +321,21 @@ Node *Parser2::parse_F()
 
     if (ast->get_tag() == AST_VARREF && m_lexer->peek() != nullptr && m_lexer->peek()->get_tag() == TOK_LPAREN)
     {
+      // F -> ^ ( OptArgList )
       ast->set_tag(AST_FNCALL);
 
+      // F -> ^ OptArgList )
       expect_and_discard(TOK_LPAREN);
 
       Node *args = parse_OptArgList();
 
       if (args != nullptr)
       {
+        // F -> ^ )
         ast->append_kid(args);
       }
 
+      // F -> ^
       expect_and_discard(TOK_RPAREN);
     }
 
@@ -339,7 +345,11 @@ Node *Parser2::parse_F()
   {
     // F -> ^ ( A )
     expect_and_discard(TOK_LPAREN);
+
+    // F -> ^ A )
     std::unique_ptr<Node> ast(parse_A());
+
+    // F -> ^ )
     expect_and_discard(TOK_RPAREN);
     return ast.release();
   }
@@ -353,21 +363,24 @@ Node *Parser2::parse_OptArgList()
 {
   if (m_lexer->peek() != nullptr && m_lexer->peek()->get_tag() != TOK_RPAREN)
   {
+    // OptArgList -> ArgList
     Node *ast = new Node(AST_ARGUMENT_LIST);
     parse_ArgList(ast);
     return ast;
   }
 
+  // OptArgList -> epsilon
   return nullptr;
 }
 
 Node *Parser2::parse_ArgList(Node *ast)
 {
-  // MAKE ARGLIST AST NODE AND APPEND L AND ARGLIST KIDS TO IT
+  // ArgList -> ^ L
    ast->append_kid(parse_L());
 
   if (m_lexer->peek() != nullptr && m_lexer->peek()->get_tag() == TOK_COMMA)
   {
+    // ArgList -> ^ , ArgList
     expect_and_discard(TOK_COMMA);
     parse_ArgList(ast);
   }
