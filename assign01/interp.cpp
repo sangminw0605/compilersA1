@@ -48,6 +48,10 @@ void Interpreter::analyze_recurse(Node *ast)
   // We define a VARREF, insert into map
   if (ast->get_tag() == AST_DEFINITION)
   {
+    if (set.find(ast->get_str()) != set.end())
+    {
+      SemanticError::raise(ast->get_loc(), "Variable already defined");
+    }
     set.insert(ast->get_kid(0)->get_str().c_str());
   }
 
@@ -166,6 +170,10 @@ Value Interpreter::ex(Node *ast, Environment *env)
     return 0;
   }
 
+  if (non_numeric(ast->get_kid(0), env))
+  {
+    EvaluationError::raise(ast->get_loc(), "Non-numeric condition");
+  }
   int val1 = (ex(ast->get_kid(0), env)).get_ival();
 
   if (ast->get_tag() == AST_LOGICAL_AND)
@@ -181,6 +189,11 @@ Value Interpreter::ex(Node *ast, Environment *env)
     {
       return 1;
     }
+  }
+
+  if (non_numeric(ast->get_kid(1), env))
+  {
+    EvaluationError::raise(ast->get_loc(), "Non-numeric condition");
   }
 
   int val2 = (ex(ast->get_kid(1), env)).get_ival();
@@ -254,7 +267,7 @@ Value Interpreter::intrinsic_println(Value args[], unsigned num_args,
                                      const Location &loc, Interpreter *interp)
 {
   if (num_args != 1)
-    EvaluationError::raise(loc, "Wrong number of arguments passed to print function");
+    EvaluationError::raise(loc, "Wrong number of arguments passed to println function");
   printf("%s\n", args[0].as_str().c_str());
   return Value();
 }
