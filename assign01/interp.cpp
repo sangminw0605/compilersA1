@@ -20,6 +20,8 @@ Interpreter::~Interpreter()
 void Interpreter::analyze()
 {
   // Recursively analyze nodes of the ast
+  set.insert("print");
+  set.insert("println");
   analyze_recurse(m_ast);
 }
 
@@ -91,9 +93,12 @@ Value Interpreter::ex(Node *ast, Environment *env)
     Environment *location = findEnv(ast, env);
 
     unsigned numargs = ast->get_num_kids();
+    Value args[numargs];
 
-    // printf("%d\n", ex(ast->get_kid(0), env).get_ival());
-    Value args[numargs] = {ex(ast->get_kid(0), env)};
+    for (unsigned int i = 0; i < ast->get_num_kids(); i++)
+    {
+      args[i] = ex(ast->get_kid(i), env);
+    }
 
     IntrinsicFn fn = (location->lookup(ast->get_str())).get_intrinsic_fn();
     return fn(args, numargs, ast->get_loc(), this);
@@ -118,9 +123,8 @@ Value Interpreter::ex(Node *ast, Environment *env)
   if (ast->get_tag() == AST_ASSIGNMENT)
   {
     Environment *location = findEnv(ast->get_kid(0), env);
-    int i = ex(ast->get_kid(1), env).get_ival();
-    location->assign(ast->get_kid(0)->get_str(), i);
-    return i;
+    location->assign(ast->get_kid(0)->get_str(), ex(ast->get_kid(1), env));
+    return location->lookup(ast->get_kid(0)->get_str());
   }
 
   if (ast->get_tag() == AST_VARREF)
@@ -131,6 +135,10 @@ Value Interpreter::ex(Node *ast, Environment *env)
 
   if (ast->get_tag() == AST_IF)
   {
+    if (non_numeric(ast->get_kid(0), env))
+    {
+      EvaluationError::raise(ast->get_loc(), "Non-numeric condition");
+    }
     if (ex(ast->get_kid(0), env).get_ival() != 0)
     {
       Environment *block_env = new Environment(env);
@@ -138,7 +146,6 @@ Value Interpreter::ex(Node *ast, Environment *env)
     }
     else if (ast->get_last_kid()->get_tag() == AST_ELSE)
     {
-
       Environment *block_env = new Environment(env);
       ex(ast->get_last_kid()->get_kid(0), block_env);
     }
@@ -147,6 +154,10 @@ Value Interpreter::ex(Node *ast, Environment *env)
 
   if (ast->get_tag() == AST_WHILE)
   {
+    if (non_numeric(ast->get_kid(0), env))
+    {
+      EvaluationError::raise(ast->get_loc(), "Non-numeric condition");
+    }
     while (ex(ast->get_kid(0), env).get_ival() != 0)
     {
       Environment *block_env = new Environment(env);
@@ -179,7 +190,6 @@ Value Interpreter::ex(Node *ast, Environment *env)
 
 Environment *Interpreter::findEnv(Node *ref, Environment *env)
 {
-
   while (!env->has(ref->get_str()))
   {
     env = env->getParent();
@@ -247,4 +257,35 @@ Value Interpreter::intrinsic_println(Value args[], unsigned num_args,
     EvaluationError::raise(loc, "Wrong number of arguments passed to print function");
   printf("%s\n", args[0].as_str().c_str());
   return Value();
+}
+
+bool Interpreter::non_numeric(Node *ast, Environment *env)
+{
+  switch (ast->get_tag())
+  {
+  case AST_VARREF:
+  {
+    Environment *location = findEnv(ast, env);
+    if (location->lookup(ast->get_str()).is_numeric())
+    {
+      return false;
+    }
+    else
+    {
+      return true;
+    }
+  }
+  case AST_UNIT:
+  case AST_STATEMENT:
+  case AST_DEFINITION:
+  case AST_ASSIGNMENT:
+  case AST_IF:
+  case AST_ELSE:
+  case AST_STATEMENT_LIST:
+  case AST_WHILE:
+  case AST_FNCALL:
+    return true;
+  default:
+    return false;
+  }
 }

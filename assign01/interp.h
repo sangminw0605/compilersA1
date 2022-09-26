@@ -38,6 +38,7 @@ private:
   static Value intrinsic_print(Value args[], unsigned num_args, const Location &loc, Interpreter *interp);
   static Value intrinsic_println(Value args[], unsigned num_args, const Location &loc, Interpreter *interp);
 
+  bool non_numeric(Node *ast, Environment *env);
 };
 
 #endif // INTERP_H
