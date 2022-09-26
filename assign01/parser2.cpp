@@ -351,19 +351,12 @@ Node *Parser2::parse_F()
 
 Node *Parser2::parse_OptArgList()
 {
-  if (m_lexer->peek()->get_tag() == TOK_RPAREN)
+  if (m_lexer->peek() != nullptr && m_lexer->peek()->get_tag() != TOK_RPAREN)
   {
-    return nullptr;
+    return parse_ArgList();
   }
 
-  std::unique_ptr<Node> ast(new Node(AST_STATEMENT_LIST));
-
-  while (m_lexer->peek() != nullptr && m_lexer->peek()->get_tag() != TOK_RPAREN)
-  {
-    ast->append_kid(parse_ArgList());
-  }
-
-  return ast.release();
+  return nullptr;
 }
 
 Node *Parser2::parse_ArgList()

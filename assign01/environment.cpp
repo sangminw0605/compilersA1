@@ -1,4 +1,5 @@
 #include "environment.h"
+#include <iostream>
 
 using std::map;
 
@@ -16,15 +17,16 @@ Environment::~Environment()
 
 void Environment::assign(std::string var, Value i)
 {
-  // A → ident = A
   references[var] = i;
 }
 
-bool Environment::has(std::string var) {
+bool Environment::has(std::string var)
+{
   return (references.count(var) != 0);
 }
 
-Environment* Environment::getParent() {
+Environment *Environment::getParent()
+{
   return m_parent;
 }
 
@@ -32,7 +34,6 @@ Value Environment::lookup(std::string var)
 {
   // F → ident
   return references[var];
-
 }
 
 void Environment::define(std::string var)
@@ -40,6 +41,6 @@ void Environment::define(std::string var)
   // Stmt → var ident ;
 
   // use int min as a marker for now
-  references.insert({var, 0});
+  references.insert({var, -1});
 }
-  // TODO: implement member functions
+// TODO: implement member functions

@@ -34,6 +34,10 @@ private:
   // Recursively analyze AST for semantic errors
   void analyze_recurse(Node *ast);
   // TODO: private member functions
+
+  static Value intrinsic_print(Value args[], unsigned num_args, const Location &loc, Interpreter *interp);
+  static Value intrinsic_println(Value args[], unsigned num_args, const Location &loc, Interpreter *interp);
+
 };
 
 #endif // INTERP_H

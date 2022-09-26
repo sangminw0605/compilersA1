@@ -56,11 +56,17 @@ void Interpreter::analyze_recurse(Node *ast)
   }
 }
 
-
 Value Interpreter::execute()
 {
   // TODO: implement
   Environment *global_env = new Environment();
+
+  global_env->define("print");
+  global_env->define("println");
+
+  global_env->assign("print", &intrinsic_print);
+  global_env->assign("println", &intrinsic_println);
+
   for (unsigned int i = 0; i < m_ast->get_num_kids() - 1; i++)
   {
     ex(m_ast->get_kid(i), global_env);
@@ -80,6 +86,19 @@ Value Interpreter::ex(Node *ast, Environment *env)
     return 0;
   }
 
+  if (ast->get_tag() == AST_FNCALL)
+  {
+    Environment *location = findEnv(ast, env);
+
+    unsigned numargs = ast->get_num_kids();
+
+    // printf("%d\n", ex(ast->get_kid(0), env).get_ival());
+    Value args[numargs] = {ex(ast->get_kid(0), env)};
+
+    IntrinsicFn fn = (location->lookup(ast->get_str())).get_intrinsic_fn();
+    return fn(args, numargs, ast->get_loc(), this);
+  }
+
   if (ast->get_tag() == AST_STATEMENT)
   {
     return ex(ast->get_kid(0), env);
@@ -92,15 +111,16 @@ Value Interpreter::ex(Node *ast, Environment *env)
 
   if (ast->get_tag() == AST_DEFINITION)
   {
-    env->define(ast->get_str());
+    env->define(ast->get_kid(0)->get_str());
     return 0;
   }
 
   if (ast->get_tag() == AST_ASSIGNMENT)
   {
-    Environment *location = findEnv(ast, env);
-    location->assign(ast->get_kid(0)->get_str(), ex(ast->get_kid(1), env));
-    return location->lookup(ast->get_kid(0)->get_str());
+    Environment *location = findEnv(ast->get_kid(0), env);
+    int i = ex(ast->get_kid(1), env).get_ival();
+    location->assign(ast->get_kid(0)->get_str(), i);
+    return i;
   }
 
   if (ast->get_tag() == AST_VARREF)
@@ -115,8 +135,9 @@ Value Interpreter::ex(Node *ast, Environment *env)
     {
       Environment *block_env = new Environment(env);
       ex(ast->get_kid(1), block_env);
-
-    } else if (ast->get_last_kid()->get_tag() == AST_ELSE) {
+    }
+    else if (ast->get_last_kid()->get_tag() == AST_ELSE)
+    {
 
       Environment *block_env = new Environment(env);
       ex(ast->get_last_kid()->get_kid(0), block_env);
@@ -158,6 +179,7 @@ Value Interpreter::ex(Node *ast, Environment *env)
 
 Environment *Interpreter::findEnv(Node *ref, Environment *env)
 {
+
   while (!env->has(ref->get_str()))
   {
     env = env->getParent();
@@ -209,8 +231,9 @@ Value Interpreter::doOp(int tag, int op1, int op2, Node *divisor)
   return 0;
 }
 
-/*Value Interpreter::intrinsic_print(Value args[], unsigned num_args,
-                                   const Location &loc, Interpreter *interp) {
+Value Interpreter::intrinsic_print(Value args[], unsigned num_args,
+                                   const Location &loc, Interpreter *interp)
+{
   if (num_args != 1)
     EvaluationError::raise(loc, "Wrong number of arguments passed to print function");
   printf("%s", args[0].as_str().c_str());
@@ -218,9 +241,10 @@ Value Interpreter::doOp(int tag, int op1, int op2, Node *divisor)
 }
 
 Value Interpreter::intrinsic_println(Value args[], unsigned num_args,
-                                   const Location &loc, Interpreter *interp) {
+                                     const Location &loc, Interpreter *interp)
+{
   if (num_args != 1)
     EvaluationError::raise(loc, "Wrong number of arguments passed to print function");
   printf("%s\n", args[0].as_str().c_str());
   return Value();
-}*/
+}
