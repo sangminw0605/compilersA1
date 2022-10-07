@@ -33,3 +33,9 @@ variable. The short circuiting is accomplished by checking the first operand of 
 operand. The intrinsic functions exist as variables in the environment, and have their function calls
 defined in the interpreter, and bound to the keyword in the environment. Other variables may actually
 reference these functions, using the assignment operator.
+
+For Assignment 2 Milestone 2, the user defined functions as well as readint() intrinsic function calls
+were implemented. The readint reads an integer from user input using the scanf() command, and returns the
+input value to the interpreter. The user defined functions store the Statement list in its value and is used/
+interpreted when the function is evaluated. A function call environment is created for each function from its
+parent environment, which is used during each call.
