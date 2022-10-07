@@ -147,8 +147,9 @@ Value Interpreter::ex(Node *ast, Environment *env)
     Environment *location = findEnv(ast, env);
     if ((location->lookup(ast->get_str())).get_kind() == VALUE_FUNCTION)
     {
-      Environment *f_block = new Environment(env);
       Function *fn = (location->lookup(ast->get_str())).get_function();
+      Environment *f_block = new Environment(fn->get_parent_env());
+
       // Get args the the program entered
       if (ast->get_num_kids() == 0)
       {
@@ -410,7 +411,7 @@ Value Interpreter::intrinsic_println(Value args[], unsigned num_args,
   return Value();
 }
 
-// Intrinsic println operation
+// Intrinsic readint operation
 Value Interpreter::intrinsic_readint(Value args[], unsigned num_args,
                                      const Location &loc, Interpreter *interp)
 {
@@ -429,7 +430,7 @@ bool Interpreter::non_numeric(Node *ast, Environment *env)
   case AST_VARREF:
   {
     Environment *location = findEnv(ast, env);
-    if (location->lookup(ast->get_str()).is_numeric())
+    if (location->lookup(ast->get_str()).is_numeric() || location->lookup(ast->get_str()).get_kind() == VALUE_FUNCTION)
     {
       return false;
     }
@@ -446,7 +447,6 @@ bool Interpreter::non_numeric(Node *ast, Environment *env)
   case AST_ELSE:
   case AST_STATEMENT_LIST:
   case AST_WHILE:
-  case AST_FNCALL:
     return true;
   default:
     return false;
