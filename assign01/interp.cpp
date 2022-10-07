@@ -27,6 +27,7 @@ void Interpreter::analyze()
   // Define intrinsic functions
   env->define("print");
   env->define("println");
+  env->define("readint");
 
   // Recurse over tree to search for semantic error
   analyze_recurse(m_ast, env);
@@ -39,7 +40,8 @@ void Interpreter::analyze_recurse(Node *ast, Environment *env)
   {
 
     // Check if VARREF was defined
-    if (findEnv(ast, env)->has(ast->get_str())) {
+    if (findEnv(ast, env)->has(ast->get_str()))
+    {
       return;
     }
 
@@ -71,10 +73,12 @@ Value Interpreter::execute()
   // Define intrinsic functions
   global_env->define("print");
   global_env->define("println");
+  global_env->define("readint");
 
   // Bind intrinsic functions
   global_env->assign("print", &intrinsic_print);
   global_env->assign("println", &intrinsic_println);
+  global_env->assign("readint", &intrinsic_readint);
 
   // Evaluates each statement
   for (unsigned int i = 0; i < m_ast->get_num_kids() - 1; i++)
@@ -91,11 +95,11 @@ Value Interpreter::ex(Node *ast, Environment *env)
   // Execute each statement in a block of statements
   if (ast->get_tag() == AST_STATEMENT_LIST)
   {
-    for (unsigned int i = 0; i < ast->get_num_kids(); i++)
+    for (unsigned int i = 0; i < ast->get_num_kids() - 1; i++)
     {
       ex(ast->get_kid(i), env);
     }
-    return 0;
+    return ex(ast->get_last_kid(), env);
   }
 
   // Call function
@@ -105,13 +109,21 @@ Value Interpreter::ex(Node *ast, Environment *env)
     Environment *location = findEnv(ast, env);
 
     // Get args the the program entered
+    if (ast->get_num_kids() == 0) {
+      IntrinsicFn fn = (location->lookup(ast->get_str())).get_intrinsic_fn();
+      return fn(nullptr, 0, ast->get_loc(), this);
+    }
+
     unsigned numargs = ast->get_kid(0)->get_num_kids();
     Value args[numargs];
 
     // Evaluate each arg
-    for (unsigned int i = 0; i < ast->get_kid(0)->get_num_kids(); i++)
+    if (numargs != 0)
     {
-      args[i] = ex(ast->get_kid(0)->get_kid(i), env);
+      for (unsigned int i = 0; i < ast->get_kid(0)->get_num_kids(); i++)
+      {
+        args[i] = ex(ast->get_kid(0)->get_kid(i), env);
+      }
     }
 
     // Retrieve the function
@@ -321,6 +333,17 @@ Value Interpreter::intrinsic_println(Value args[], unsigned num_args,
     EvaluationError::raise(loc, "Wrong number of arguments passed to println function");
   printf("%s\n", args[0].as_str().c_str());
   return Value();
+}
+
+// Intrinsic println operation
+Value Interpreter::intrinsic_readint(Value args[], unsigned num_args,
+                                     const Location &loc, Interpreter *interp)
+{
+  if (num_args != 0)
+    EvaluationError::raise(loc, "Wrong number of arguments passed to readint function");
+  int read;
+  scanf(" %d", &read);
+  return read;
 }
 
 // Return true if var value is non numeric

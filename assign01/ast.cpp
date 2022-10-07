@@ -58,6 +58,10 @@ std::string ASTTreePrint::node_tag_to_string(int tag) const {
     return "FNCALL";
   case AST_ARGUMENT_LIST:
     return "ARGLIST";
+  case AST_FUNCTION:
+    return "FUNCTION";
+  case AST_P_LIST:
+    return "PARAMETER_LIST";
   default:
     RuntimeError::raise("Unknown AST node type %d\n", tag);
   }

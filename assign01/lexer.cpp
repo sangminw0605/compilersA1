@@ -154,6 +154,8 @@ Node *Lexer::read_token()
     else if (tok->get_str().compare("while") == 0)
     {
       tok->set_tag(TOK_WHILE);
+    } else if (tok->get_str().compare("function") == 0) {
+      tok->set_tag(TOK_FUNC);
     }
 
     return tok;

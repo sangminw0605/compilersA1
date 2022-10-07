@@ -38,6 +38,8 @@ private:
   // Intrinsic function calls
   static Value intrinsic_print(Value args[], unsigned num_args, const Location &loc, Interpreter *interp);
   static Value intrinsic_println(Value args[], unsigned num_args, const Location &loc, Interpreter *interp);
+  static Value intrinsic_readint(Value args[], unsigned num_args, const Location &loc, Interpreter *interp);
+
 
   // Check if node is non numeric
   bool non_numeric(Node *ast, Environment *env);
