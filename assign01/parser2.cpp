@@ -74,12 +74,16 @@ Node *Parser2::parse_TStmt()
 
     expect_and_discard(TOK_LPAREN);
 
-    s->append_kid(parse_OptPList());
+    Node *plist = parse_OptPList();
+
+    if (plist != nullptr)
+    {
+      s->append_kid(plist);
+    }
 
     expect_and_discard(TOK_RPAREN);
     expect_and_discard(TOK_LBRACK);
 
-    
     Node *fnbody = new Node(AST_STATEMENT_LIST);
     s->append_kid(parse_SList(fnbody));
     expect_and_discard(TOK_RBRACK);

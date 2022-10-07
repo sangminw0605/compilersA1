@@ -51,22 +51,36 @@ void Interpreter::analyze_recurse(Node *ast, Environment *env)
   }
 
   // We define a VARREF, insert into map
-  if (ast->get_tag() == AST_DEFINITION)
+  if (ast->get_tag() == AST_DEFINITION || ast->get_tag() == AST_FUNCTION)
   {
     env->define(ast->get_kid(0)->get_str());
+  }
+
+  if (ast->get_tag() == AST_P_LIST)
+  {
+    for (unsigned int i = 0; i < ast->get_num_kids(); i++)
+    {
+      env->define(ast->get_kid(i)->get_str());
+    }
   }
 
   // Check all of node's children
   for (unsigned int i = 0; i < ast->get_num_kids(); i++)
   {
-    analyze_recurse(ast->get_kid(i), env);
+    if (ast->get_kid(i)->get_tag() == AST_IF || ast->get_kid(i)->get_tag() == AST_WHILE || ast->get_kid(i)->get_tag() == AST_ELSE || ast->get_kid(i)->get_tag() == AST_FUNCTION)
+    {
+      analyze_recurse(ast->get_kid(i), new Environment(env));
+    }
+    else
+    {
+      analyze_recurse(ast->get_kid(i), env);
+    }
   }
 }
 
 Value Interpreter::execute()
 {
   // TODO: implement
-
   // Global environment
   Environment *global_env = new Environment();
 
@@ -102,14 +116,75 @@ Value Interpreter::ex(Node *ast, Environment *env)
     return ex(ast->get_last_kid(), env);
   }
 
+  if (ast->get_tag() == AST_FUNCTION)
+  {
+    std::string fn_name;
+    std::vector<std::string> param_names;
+    Node *body;
+
+    fn_name = ast->get_kid(0)->get_str();
+    if (ast->get_num_kids() != 2)
+    {
+      for (unsigned int i = 0; i < ast->get_kid(1)->get_num_kids(); i++)
+      {
+        param_names.push_back(ast->get_kid(1)->get_kid(i)->get_str());
+      }
+    }
+
+    body = ast->get_last_kid();
+
+    Value fn_val(new Function(fn_name, param_names, env, body));
+    env->define(fn_name);
+    env->assign(fn_name, fn_val);
+
+    return 0;
+  }
+
   // Call function
   if (ast->get_tag() == AST_FNCALL)
   {
     // Find the function definition
     Environment *location = findEnv(ast, env);
+    if ((location->lookup(ast->get_str())).get_kind() == VALUE_FUNCTION)
+    {
+      Environment *f_block = new Environment(env);
+      Function *fn = (location->lookup(ast->get_str())).get_function();
+      // Get args the the program entered
+      if (ast->get_num_kids() == 0)
+      {
+        if (fn->get_num_params() == 0)
+        {
+          return ex(fn->get_body(), f_block);
+        }
+        else
+        {
+          EvaluationError::raise(ast->get_loc(), "Invalid params");
+        }
+      }
+
+      unsigned numargs = ast->get_kid(0)->get_num_kids();
+
+      if (numargs != fn->get_num_params())
+      {
+        EvaluationError::raise(ast->get_loc(), "Invalid params");
+      }
+      // Evaluate each arg
+      for (unsigned int i = 0; i < ast->get_kid(0)->get_num_kids(); i++)
+      {
+        f_block->define(fn->get_params()[i]);
+        f_block->assign(fn->get_params()[i], ex(ast->get_kid(0)->get_kid(i), env));
+      }
+
+      return ex(fn->get_body(), f_block);
+    }
+    
+    if ((location->lookup(ast->get_str())).get_kind() != VALUE_INTRINSIC_FN) {
+      EvaluationError::raise(ast->get_loc(), "Invalid function");
+    }
 
     // Get args the the program entered
-    if (ast->get_num_kids() == 0) {
+    if (ast->get_num_kids() == 0)
+    {
       IntrinsicFn fn = (location->lookup(ast->get_str())).get_intrinsic_fn();
       return fn(nullptr, 0, ast->get_loc(), this);
     }
